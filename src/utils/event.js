@@ -1,6 +1,9 @@
 import dayjs from 'dayjs';
 import { DateFormat, EditFormMode } from '../const';
 
+const MINUTES_IN_HOUR = 60;
+const HOURS_IN_DAY = 24;
+
 const getDateString = (date, format) =>
   date ? dayjs(date).format(format) : '';
 const getHumanizeDate = (date) => getDateString(date, DateFormat.HUMANIZE);
@@ -35,23 +38,23 @@ const getDurationString = (dateFrom, dateTo) => {
   };
 
   duration.minutes = getDurationMinutes(dateFrom, dateTo);
-  duration.hours = Math.floor(duration.minutes / 60);
-  duration.minutes = duration.minutes % 60;
-  duration.days = Math.floor(duration.hours / 24);
-  duration.hours = duration.hours % 24;
+  duration.hours = Math.floor(duration.minutes / MINUTES_IN_HOUR);
+  duration.minutes = duration.minutes % MINUTES_IN_HOUR;
+  duration.days = Math.floor(duration.hours / HOURS_IN_DAY);
+  duration.hours = duration.hours % HOURS_IN_DAY;
 
   return duration.getHumanizeString();
 };
 
 const getPeriodString = (dateFrom, dateTo, delimiter) => {
-  const period = [];
+  const periods = [];
 
   const dateFromFormat = DateFormat.HUMANIZE_FIRSTDAY;
-  period.push(getDateString(dateFrom, dateFromFormat));
+  periods.push(getDateString(dateFrom, dateFromFormat));
 
-  period.push(getDateString(dateTo, DateFormat.HUMANIZE_FIRSTDAY));
+  periods.push(getDateString(dateTo, DateFormat.HUMANIZE_FIRSTDAY));
 
-  return period.join(delimiter);
+  return periods.join(delimiter);
 };
 
 const getValueFromArrayById = (array, id) =>

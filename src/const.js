@@ -1,5 +1,3 @@
-const EVENT_COUNT = 5;
-
 const EVENT_TYPES = [
   'Taxi',
   'Bus',
@@ -100,17 +98,19 @@ const TimeLimit = {
   UPPER: 1000,
 };
 
+const MAX_LIMIT_TRIP_ROUTE = 3;
+
 export {
   ApiConfig,
   DEFAULT_EVENT_PROPS,
   DEFAULT_FILTER_TYPE,
   DEFAULT_SORT_TYPE,
   DateFormat,
-  EVENT_COUNT,
   EVENT_TYPES,
   EditFormMode,
   EventStateAction,
   FilterType,
+  MAX_LIMIT_TRIP_ROUTE,
   SORT_TEMPLATE_PROPS,
   SortType,
   TimeLimit,
