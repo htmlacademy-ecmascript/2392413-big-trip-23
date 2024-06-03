@@ -11,14 +11,14 @@ import {
 } from '../utils/event';
 
 const createEventTypeListTemplate = ({ type }) => {
-  const eventTypeListTemplate = [];
-  eventTypeListTemplate.push(`<fieldset class="event__type-group">
+  const eventTypeListTemplates = [];
+  eventTypeListTemplates.push(`<fieldset class="event__type-group">
   <legend class="visually-hidden">Event type</legend>`);
 
   EVENT_TYPES.forEach((typeEvent) => {
     const typeEventCode = typeEvent.toLowerCase();
     const checkedProperty = typeEventCode === type ? 'checked' : '';
-    eventTypeListTemplate.push(`<div class="event__type-item">
+    eventTypeListTemplates.push(`<div class="event__type-item">
     <input id="event-type-${typeEventCode}"
     class="event__type-input  visually-hidden" type="radio" name="event-type"
     value="${typeEventCode}" ${checkedProperty}>
@@ -27,16 +27,16 @@ const createEventTypeListTemplate = ({ type }) => {
   </div>`);
   });
 
-  eventTypeListTemplate.push('</fieldset>');
-  return eventTypeListTemplate.join('');
+  eventTypeListTemplates.push('</fieldset>');
+  return eventTypeListTemplates.join('');
 };
 
 const createEventTypeTemplate = ({ type } = {}) => {
-  const eventTypeTemplate = [];
+  const eventTypeTemplates = [];
   const eventTypeListTemplate = createEventTypeListTemplate({
     type,
   });
-  eventTypeTemplate.push(`<div class="event__type-wrapper">
+  eventTypeTemplates.push(`<div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle">
           <span class="visually-hidden">Choose event type</span>
           <img class="event__type-icon" width="17" height="17"
@@ -48,7 +48,7 @@ const createEventTypeTemplate = ({ type } = {}) => {
         </div>
       </div>`);
 
-  return eventTypeTemplate.join('');
+  return eventTypeTemplates.join('');
 };
 const createDestinationTemplate = ({ type, destination, cities }) => {
   const elements = [];
@@ -131,27 +131,27 @@ const createDestinationDetailTemplate = ({ cities, destination } = {}) => {
   if (!description && !pictures.length) {
     return '';
   }
-  const destinationtemplates = [];
-  destinationtemplates.push(`<section class="event__section  event__section--destination">
+  const destinationTemplates = [];
+  destinationTemplates.push(`<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
     <p class="event__destination-description">${description}</p>`);
 
   if (pictures.length) {
-    destinationtemplates.push(
+    destinationTemplates.push(
       '<div class="event__photos-container"><div class="event__photos-tape">'
     );
 
     pictures.forEach((picture) => {
-      destinationtemplates.push(
+      destinationTemplates.push(
         `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`
       );
     });
 
-    destinationtemplates.push('</div></div></section>');
+    destinationTemplates.push('</div></div></section>');
   }
-  destinationtemplates.push('</section>');
+  destinationTemplates.push('</section>');
 
-  return destinationtemplates.join('');
+  return destinationTemplates.join('');
 };
 
 const createEventEditTemplate = (eventState) => {
@@ -159,7 +159,7 @@ const createEventEditTemplate = (eventState) => {
   const destinationTemplate = createDestinationTemplate(eventState);
   const eventDateTemplate = createEventDateTemplate(eventState);
   const priceTemplate = createPriceTemplate(eventState);
-  const offerTemplates = createOffersTemplate(eventState);
+  const offerTemplate = createOffersTemplate(eventState);
   const destinationDetailTemplate = createDestinationDetailTemplate(eventState);
   const { isSaving, isDeleting } = eventState;
   const resetButtonCaption = () => {
@@ -184,7 +184,7 @@ const createEventEditTemplate = (eventState) => {
       </button>
     </header>
     <section class="event__details">
-      ${offerTemplates}
+      ${offerTemplate}
       ${destinationDetailTemplate}
     </section>
   </form>`;
@@ -194,7 +194,7 @@ export default class EventEditView extends AbstractStatefulView {
   #cities = null;
   #offersList = null;
   #handleFormSubmit = null;
-  #handleCancelClick = null;
+  #handleFormReset = null;
   #handleDeleteClick = null;
   #datepickers = new Map();
 
@@ -224,7 +224,7 @@ export default class EventEditView extends AbstractStatefulView {
     this.#cities = cities;
     this.#offersList = offersList;
     this.#handleFormSubmit = onFormSubmit;
-    this.#handleCancelClick = onCancelClick;
+    this.#handleFormReset = onCancelClick;
     this.#handleDeleteClick = onDeleteClick;
     this._restoreHandlers();
   }
@@ -247,17 +247,18 @@ export default class EventEditView extends AbstractStatefulView {
 
   _restoreHandlers = () => {
     this.element.addEventListener('submit', this.#onFormSubmit);
-    this.element.addEventListener('reset', this.#onCancelClick);
+    this.element.addEventListener('reset', this.#onFormReset);
 
     if (!isNewEvent(this._state)) {
       this.element
         .querySelector('.event__reset-btn')
-        .addEventListener('click', this.#onDeleteClick);
+        .addEventListener('click', this.#onDeleteButtonClick);
     }
 
     this.element
       .querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#onCancelClick);
+      .addEventListener('click', this.#onRollupButtonClick);
+
     this.element
       .querySelector('.event__type-group')
       .addEventListener('change', this.#onEventTypeChange);
@@ -296,11 +297,15 @@ export default class EventEditView extends AbstractStatefulView {
     this.#handleFormSubmit(event);
   };
 
-  #onCancelClick = () => {
-    this.#handleCancelClick();
+  #onFormReset = () => {
+    this.#handleFormReset();
   };
 
-  #onDeleteClick = (evt) => {
+  #onRollupButtonClick = () => {
+    this.#onFormReset();
+  };
+
+  #onDeleteButtonClick = (evt) => {
     evt.preventDefault();
     const event = EventEditView.parseStateToEvent(this._state);
     this.#handleDeleteClick(event);

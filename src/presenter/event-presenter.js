@@ -77,9 +77,9 @@ export default class EventPresenter {
     this.#newEventButtonElement.disabled =
       this.#isError || this.#isNewEventFormActive();
     if (this.#activePresenter) {
-      document.addEventListener('keydown', this.#onEscKeyDown);
+      document.addEventListener('keydown', this.#onDocumentKeydown);
     } else {
-      document.removeEventListener('keydown', this.#onEscKeyDown);
+      document.removeEventListener('keydown', this.#onDocumentKeydown);
     }
   };
 
@@ -242,7 +242,7 @@ export default class EventPresenter {
 
   #renderSort = () => {
     this.#sortComponent = new SortView({
-      onSortButtonClick: this.#onSortButtonClick,
+      onSortChange: this.#onSortChange,
       currentSortType: this.#currentSortType,
     });
     render(this.#sortComponent, this.#container);
@@ -331,7 +331,7 @@ export default class EventPresenter {
     this.#setActivePresenter(null);
   };
 
-  #onEscKeyDown = (evt) => {
+  #onDocumentKeydown = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
       this.#onEventEditStateChange(
@@ -341,7 +341,7 @@ export default class EventPresenter {
     }
   };
 
-  #onSortButtonClick = (sortType) => {
+  #onSortChange = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
     }
